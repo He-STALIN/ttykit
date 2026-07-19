@@ -9,14 +9,14 @@ class CustomStatus:
 
     Args:
         message (str): some description for task. Can't be empty
-        spinner: animation for task executing. Avaliable animations: `bar`, `ball`, `dots`, `dots12`, `points`, `bouncingBar`, `wave`, `pulse`, `moon`, `clock`, `snake`, `line`, `box`, `arc`
+        spinner: animation for task executing. Avaliable animations: `bar`, `ball` ... see all `python -m ttykit.spinner`
         color: color of name of task unit. Default: cyan
     Returns:
         None: show task in the terminal
     Examples:
     ### Realization:
     ```python
-    from <this lib> import CustomStatus, TaskState
+    from ttykit import CustomStatus, TaskState
 
     with CustomStatus("Unit Test 8", spinner="dots12") as status:
         # <task1>
@@ -55,7 +55,7 @@ class CustomStatus:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.running = False
         time.sleep(0.1)
-        state_color = GREEN if self.state == TaskState.SUCCESS else RED if self.state == TaskState.ERROR else YELLOW
+        state_color = Colors.GREEN if self.state == TaskState.SUCCESS else Colors.RED if self.state == TaskState.ERROR else Colors.YELLOW
         state_text = "  OK  " if self.state == TaskState.SUCCESS else " FAIL " if self.state == TaskState.ERROR else " WARN "
         print(f"\r[{state_color}{state_text}{RESET}] Loading {self._get_color()}{self.message}{RESET}")
 
@@ -73,7 +73,7 @@ class CustomStatus:
         self.animation_thread.start()
 
     def _get_color(self):
-        return (CYAN if self.color == "CYAN" else GREEN if self.color == "GREEN" else RED)
+        return (Colors.CYAN if self.color == "CYAN" else Colors.GREEN if self.color == "GREEN" else Colors.RED)
 
 
     def set_message(self, new_message: str):

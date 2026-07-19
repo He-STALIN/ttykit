@@ -6,7 +6,7 @@ class CustomProgress:
     Creating Custom Loading Bar in the terminal
 
     Args:
-        total (float | int): max value of bar. Default: 100
+        total (float): max value of bar. Default: 100
         prefix (str): some description of bar. Can be empty
         bar_length (int): how many characters in bar length. Default: 30
     Returns:
@@ -14,6 +14,8 @@ class CustomProgress:
     Examples:
         ### realization:
         ```python
+        from ttykit import CustomProgress
+
         with CustomProgress(total=50, prefix="Loading", bar_length=100) as progress:
             while not progress.finished:
                 # <some action>
@@ -26,7 +28,7 @@ class CustomProgress:
         Loading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40%
         ```
     """
-    def __init__(self, total: float | int=100, prefix: str=None, bar_length: int=30):
+    def __init__(self, total: float=100, prefix: str=None, bar_length: int=30):
         self.total = total
         self.prefix = prefix
         self.bar_length = bar_length
@@ -45,19 +47,19 @@ class CustomProgress:
             self.current = min(value, self.total)
             self._render()
 
-    def advance(self, step: int | float=1):
+    def advance(self, step: float=1):
         """
         increase state on some steps
 
         Args:
-            step (int | float): count of step. Default: 1
+            step (float): count of step. Default: 1
         """
         self.update(self.current + step)
 
     def _render(self):
-        percent = int(self.current / self.total * 100)
-        filled = int(self.current / self.total * self.bar_length)
-        bar = f"{MAGENTA}━{RESET}" * filled + f"{GREY}━{RESET}" * (self.bar_length - filled)
+        percent =  float(self.current / self.total * 100)
+        filled = float(self.current / self.total * self.bar_length)
+        bar = f"{Colors.LIGHT_PURPLE}━{RESET}" * filled + f"{Colors.GREY}━{RESET}" * (self.bar_length - filled)
         sys.stdout.write(f"\r{self.prefix} {bar} {percent}%")
         sys.stdout.flush()
 
