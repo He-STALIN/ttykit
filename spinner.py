@@ -1,11 +1,11 @@
 import time
-from .status import CustomStatus, TaskState
-from ._state import ANIMATION
+from .status import Status, TaskState
+from ._state import STATUS_ANIMATION
 
 def show_all_spinners():
-    for name in ANIMATION.keys():
+    for name in STATUS_ANIMATION.keys():
         print(f"-==[ {name} ]==-")
-        with CustomStatus("Test", spinner=name) as status:
+        with Status("Test", spinner=name) as status:
             time.sleep(2)
             status.set_state(TaskState.SUCCESS)
 

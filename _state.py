@@ -41,7 +41,7 @@ class TaskState(Enum):
     ERROR = "error"
     WARNING = "warning"
 
-ANIMATION = {
+STATUS_ANIMATION = {
     'bar': ["[      ]", 
             "[=     ]", 
             "[==    ]",
@@ -157,4 +157,23 @@ ANIMATION = {
     'line': ["|", "/", "-", "\\"],
     'box': ["▖", "▘", "▝", "▗"],
     'arc': ["◜", "◠", "◝", "◞", "◡", "◟"]
+}
+
+BARS = {
+    'line': {
+        "filled": f"{Colors.LIGHT_PURPLE}━{RESET}",
+        "bg": f"{Colors.DARK_GREY}━{RESET}"
+    },
+    'points': {
+        "filled": "●",
+        "bg": f"{Colors.DARK_GREY}○{RESET}"
+    },
+    'blocks': {
+        "filled": "█",
+        "bg": "░"
+    },
+    "arrow": {
+        "filled": f"{Colors.GREEN}═{RESET}",
+        "bg": f"{Colors.DARK_GREY}-{RESET}"
+    }
 }

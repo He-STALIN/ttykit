@@ -3,7 +3,7 @@ import time
 import sys
 from ._state import *
 
-class CustomStatus:
+class Status:
     """
     Create animated status of task in the terminal
 
@@ -42,7 +42,7 @@ class CustomStatus:
         self.color = color
         self.spinner = spinner
         self.state = TaskState.RUNNING
-        self.frames = ANIMATION.get(self.spinner, ANIMATION['bar'])
+        self.frames = STATUS_ANIMATION.get(self.spinner, STATUS_ANIMATION['bar'])
         self.running = False
         self.animation_thread = None
         self.paused = False

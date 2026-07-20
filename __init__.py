@@ -1,7 +1,7 @@
 """Helping made beatiful out in terminal"""
 
-from .progress import CustomProgress
-from .status import CustomStatus
+from .progress import Progress
+from .status import Status
 from ._state import TaskState, Colors, Styles, RESET
 
 __colors__ = [
@@ -11,12 +11,12 @@ __colors__ = [
 ]
 
 __all__ = [
-    'CustomProgress',
-    'CustomStatus',
+    'Progress',
+    'Status',
     'TaskState'
 ]
 
 __name__ = 'ttykit'
 __author__ = 'He-STALIN'
-__version__ = '0.1.5'
+__version__ = '0.2.0'
 __license__ = 'MIT'

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ttykit"
-version = "0.1.5"
+version = "0.2.0"
 description = "Helping made beatiful out in terminal"
 authors = [{ name = "He-STALIN", email = "hene.stalin@gmail.com" }]
 license = { text = "MIT" }

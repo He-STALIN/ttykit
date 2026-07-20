@@ -1,14 +1,16 @@
 import sys
 from ._state import *
 
-class CustomProgress:
+class Progress:
     """
     Creating Custom Loading Bar in the terminal
 
     Args:
-        total (float): max value of bar. Default: 100
+        total (int): max value of bar. Default: 100
         prefix (str): some description of bar. Can be empty
         bar_length (int): how many characters in bar length. Default: 30
+        bar_style: bar performance style. Default: `line`. Avaliable styles: `line`, `points`, `blocks`, `arrow`. 
+        frames (bool): use bracket or not. Default: False
     Returns:
         None: write in the terminal
     Examples:
@@ -28,10 +30,14 @@ class CustomProgress:
         Loading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40%
         ```
     """
-    def __init__(self, total: float=100, prefix: str=None, bar_length: int=30):
+    def __init__(self, total: int=100, prefix: str=None, bar_length: int=30, bar_style='line', frames: bool=False):
         self.total = total
-        self.prefix = prefix
+        self.prefix = prefix if prefix else ""
         self.bar_length = bar_length
+        self.frames = frames
+        temp = BARS.get(bar_style)
+        self.bar_filled = temp['filled']
+        self.bar_bg = temp['bg']
         self.current = 0
         self.finished = False
 
@@ -47,20 +53,20 @@ class CustomProgress:
             self.current = min(value, self.total)
             self._render()
 
-    def advance(self, step: float=1):
+    def advance(self, step: int=1):
         """
         increase state on some steps
 
         Args:
-            step (float): count of step. Default: 1
+            step (int): count of step. Default: 1
         """
         self.update(self.current + step)
 
     def _render(self):
-        percent =  float(self.current / self.total * 100)
-        filled = float(self.current / self.total * self.bar_length)
-        bar = f"{Colors.LIGHT_PURPLE}━{RESET}" * filled + f"{Colors.GREY}━{RESET}" * (self.bar_length - filled)
-        sys.stdout.write(f"\r{self.prefix} {bar} {percent}%")
+        percent =  int(self.current / self.total * 100)
+        filled = int(self.current / self.total * self.bar_length)
+        bar = str(self.bar_filled) * filled + str(self.bar_bg) * (self.bar_length - filled)
+        sys.stdout.write(f"\r{self.prefix} {"[ " if self.frames else ""}{bar}{" ]" if self.frames else ""} {percent}%")
         sys.stdout.flush()
 
     def stop(self):
