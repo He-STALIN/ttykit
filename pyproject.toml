@@ -4,16 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ttykit"
-version = "0.2.0"
+version = "0.2.1"
 description = "Helping made beatiful out in terminal"
 authors = [{ name = "He-STALIN", email = "hene.stalin@gmail.com" }]
-license = { text = "MIT" }
+license = "MIT"
 #readme = "README.md" пока нету
 requires-python = ">=3.13"
 dependencies = []
 
 [project.scripts]
 ttykit-spinner = "ttykit.spinner:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ttykit*"]
 
 [project.urls]
 Homepage = "https://github.com/He-STALIN/ttykit"
