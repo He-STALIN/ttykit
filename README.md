@@ -9,18 +9,23 @@
 [![Repository](https://img.shields.io/badge/Repository-GitHub-4b93ff?style=flat&logo=github&logoColor=white)](https://github.com/He-STALIN/ttykit)
 
 </div>
+
 ---
 
 ## 📦 For Start
+### Manually:
 
 ```bash
 git clone https://github.com/He-STALIN/ttykit.git
 ```
 
 - Change dir and exec
+
 ```bash
 pip install .
 ```
+### Auto
+- exec `pip install ttykit`
 
 - And use in your projects!
 

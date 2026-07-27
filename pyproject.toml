@@ -8,7 +8,7 @@ include = ["ttykit*"]
 
 [project]
 name = "ttykit"
-version = "0.2.2"
+version = "0.3.0b4"
 description = "Helping made beatiful out in terminal"
 requires-python = ">=3.13"
 authors = [
