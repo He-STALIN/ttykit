@@ -65,5 +65,5 @@ def set_custom_hook(Traceback: bool= False) -> None:
 
 __name__ = 'ttykit'
 __author__ = 'He-STALIN'
-__version__ = '0.3.5'
+__version__ = '0.3.7'
 __license__ = 'MIT'
