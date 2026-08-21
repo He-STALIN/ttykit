@@ -49,7 +49,7 @@ class TUI:
         self._max_menus: int = 0
         self._menus: list = []
         kb.add_hotkey("Up", self.UpMenu)
-        kb.add_hotkey("Down", self.DownMenu)
+        kb.add_hotkey("Down", self._DownMenu)
         kb.add_hotkey("enter", self._selectAction)
 
     def _clearTerminal(self):
