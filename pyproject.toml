@@ -8,17 +8,17 @@ include = ["ttykit*"]
 
 [project]
 name = "ttykit"
-version = "0.3.0b4"
+version = "0.3.5"
 description = "Helping made beatiful out in terminal"
 requires-python = ">=3.13"
 authors = [
-    { name = "He-STALIN"}, 
+    {name = "He-STALIN"}, 
     {email = "hene.stalin@gmail.com"}
     ]
 license = {file = "LICENSE"}
 readme = "README.md"
 keywords = ['tty', 'terminal', 'formatting']
-dependencies = []
+dependencies = ["keyboard"]
 
 [project.scripts]
 ttykit-spinner = "ttykit.spinner:main"

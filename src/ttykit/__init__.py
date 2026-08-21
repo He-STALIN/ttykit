@@ -4,6 +4,7 @@ from .progress import Progress
 from .status import Status
 from ._state import TaskState, Colors, Styles, RESET
 from .console.console import Console
+from .console.TUI import TUI
 import traceback
 import sys
 
@@ -18,6 +19,7 @@ __all__ = [
     'Status',
     'TaskState',
     'Console',
+    'TUI',
     'get_console',
     'set_custom_hook'
 ]
@@ -63,5 +65,5 @@ def set_custom_hook(Traceback: bool= False) -> None:
 
 __name__ = 'ttykit'
 __author__ = 'He-STALIN'
-__version__ = '0.3.0b4'
+__version__ = '0.3.5'
 __license__ = 'MIT'
