@@ -1,5 +1,6 @@
 import sys
 from ._state import *
+import time
 
 class Progress:
     """
@@ -10,7 +11,8 @@ class Progress:
         prefix (str): some description of bar. Can be empty
         bar_length (int): how many characters in bar length. Default: 30
         bar_style: bar performance style. Default: `line`. Avaliable styles: `line`, `points`, `blocks`, `arrow`. 
-        frames (bool): use bracket or not. Default: False
+        frames (bool): use bracket or not. Default: `False`
+        show_ETA (bool): show ETA (Estimated Time of Arrival). Default: `True`
     Returns:
         None: write in the terminal
     Examples:
@@ -30,7 +32,7 @@ class Progress:
         Loading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40%
         ```
     """
-    def __init__(self, total: int=100, prefix: str=None, bar_length: int=30, bar_style='line', frames: bool=False):
+    def __init__(self, total: int=100, prefix: str=None, bar_length: int=30, bar_style='line', frames: bool=False, show_ETA: bool = True):
         self.total = total
         self.prefix = prefix if prefix else ""
         self.bar_length = bar_length
@@ -40,6 +42,10 @@ class Progress:
         self.bar_bg = temp['bg']
         self.current = 0
         self.finished = False
+        self.show_ETA = show_ETA
+
+        if self.show_ETA:
+            self.start_time = time.time()
 
     def __enter__(self):
         return self
@@ -66,7 +72,17 @@ class Progress:
         percent =  int(self.current / self.total * 100)
         filled = int(self.current / self.total * self.bar_length)
         bar = str(self.bar_filled) * filled + str(self.bar_bg) * (self.bar_length - filled)
-        sys.stdout.write(f"\r{self.prefix} {"[ " if self.frames else ""}{bar}{" ]" if self.frames else ""} {percent}%")
+
+        eta: str = " ETA: --:--:--" if self.show_ETA else ""
+        if self.show_ETA and self.current > 0:
+            elapsed = time.time() - self.start_time
+            rate = self.current / elapsed
+            seconds = (self.total - self.current) / rate
+            minutes, seconds = divmod(seconds, 60)
+            hours, minutes = divmod(minutes, 60)
+            eta = f" ETA: {int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
+        
+        sys.stdout.write(f"\r{self.prefix} {"[ " if self.frames else ""}{bar}{" ]" if self.frames else ""} {percent}%{eta}")
         sys.stdout.flush()
 
     def stop(self):

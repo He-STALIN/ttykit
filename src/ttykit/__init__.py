@@ -3,6 +3,7 @@
 from .progress import Progress
 from .status import Status
 from ._state import TaskState, Colors, Styles, RESET
+from .tree import Tree
 from .console.console import Console
 from .console.TUI import TUI
 import traceback
@@ -19,6 +20,7 @@ __all__ = [
     'Status',
     'TaskState',
     'Console',
+    'Tree',
     'TUI',
     'get_console',
     'set_custom_hook'
@@ -59,11 +61,13 @@ def set_custom_hook(Traceback: bool= False) -> None:
         Traceback (bool): replace Traceback on custom or not. Default `False`
     """
 
+    print("[WARNING] this method 'set_custom_hook' unstable and may not working")
+
     if Traceback:
         print('set custom excepthook...')
         sys.excepthook = custom_excepthook
 
 __name__ = 'ttykit'
 __author__ = 'He-STALIN'
-__version__ = '0.3.7'
+__version__ = '0.4.0'
 __license__ = 'MIT'

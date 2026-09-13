@@ -16,9 +16,9 @@ class Status:
     Examples:
     ### Realization:
     ```python
-    from ttykit import CustomStatus, TaskState
+    from ttykit import Status, TaskState
 
-    with CustomStatus("Unit Test 8", spinner="dots12") as status:
+    with Status("Unit Test 8", spinner="dots12") as status:
         # <task1>
         status.set_message("Unit Test 9")
         # <task2>
@@ -37,7 +37,7 @@ class Status:
     [  OK  ] Loading Unit Test 9
     ```
     """
-    def __init__(self, message: str, spinner="bar", color="CYAN"):
+    def __init__(self, message: str, spinner: str="bar", color="CYAN"):
         self.message = message
         self.color = color
         self.spinner = spinner
@@ -73,7 +73,7 @@ class Status:
         self.animation_thread.start()
 
     def _get_color(self):
-        return (Colors.CYAN if self.color == "CYAN" else Colors.GREEN if self.color == "GREEN" else Colors.RED)
+        return Colors.get(self.color, Colors.get('cyan'))
 
 
     def set_message(self, new_message: str):
