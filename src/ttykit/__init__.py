@@ -2,7 +2,7 @@
 
 from .progress import Progress
 from .status import Status
-from ._state import TaskState, Colors, Styles, RESET
+from .data._state import TaskState, Colors, Styles, RESET
 from .tree import Tree
 from .console.console import Console
 from .console.TUI import TUI
@@ -26,10 +26,16 @@ __all__ = [
     'set_custom_hook'
 ]
 
+console_inst: "Console" = None
+
 def get_console() -> 'Console':
     """Return a instance of `Console`"""
-    console = Console()
-    return console
+    global console_inst
+    if console_inst:
+        return console_inst
+    else:
+        console_inst = Console()
+        return console_inst
 
 def custom_excepthook(exc_type, exc_value, exc_tb):
     tb_lines = traceback.format_exception(exc_type, exc_value, exc_tb)
@@ -53,7 +59,7 @@ def custom_excepthook(exc_type, exc_value, exc_tb):
     
     print(f"╚{'═' * (max_len + 4)}╝")
 
-def set_custom_hook(Traceback: bool= False) -> None:
+def set_custom_hook(Traceback: bool=False) -> None:
     """
     Set a custom methods
 

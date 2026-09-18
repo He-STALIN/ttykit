@@ -99,7 +99,7 @@ STATUS_ANIMATION = {
             f"[=={Colors.RED}*{RESET}== ]", 
             f"[ =={Colors.RED}*{RESET}==]", 
             f"[  =={Colors.RED}*{RESET}=]", 
-            f"[   =={Colors.RED}*{RESET}]", 
+            f"[   =={Colors.RED}*{RESET}]{RESET}", 
             "[    ==]", 
             "[     =]", 
             "[      ]"

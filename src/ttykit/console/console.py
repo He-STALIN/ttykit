@@ -4,7 +4,7 @@ from typing import Optional, Literal, Mapping
 from ttykit.segmentation import Segmentation
 from getpass import getpass
 
-from .const import ColorSystem, WINDOWS
+from ..data.const import ColorSystem, WINDOWS
 
 class Console:
     """

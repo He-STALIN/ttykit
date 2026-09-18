@@ -1,5 +1,5 @@
 import re
-from ._state import Styles, Colors
+from .data._state import Styles, Colors
 
 
 class Segmentation:

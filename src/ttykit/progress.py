@@ -1,6 +1,6 @@
-import sys
-from ._state import *
+from .data._state import *
 import time
+from .console.console import Console
 
 class Progress:
     """
@@ -43,6 +43,7 @@ class Progress:
         self.current = 0
         self.finished = False
         self.show_ETA = show_ETA
+        self.console = Console()
 
         if self.show_ETA:
             self.start_time = time.time()
@@ -73,17 +74,16 @@ class Progress:
         filled = int(self.current / self.total * self.bar_length)
         bar = str(self.bar_filled) * filled + str(self.bar_bg) * (self.bar_length - filled)
 
-        eta: str = " ETA: --:--:--" if self.show_ETA else ""
+        eta: str = "ETA: --:--:--" if self.show_ETA else ""
         if self.show_ETA and self.current > 0:
             elapsed = time.time() - self.start_time
             rate = self.current / elapsed
             seconds = (self.total - self.current) / rate
             minutes, seconds = divmod(seconds, 60)
             hours, minutes = divmod(minutes, 60)
-            eta = f" ETA: {int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
+            eta = f"ETA: {int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
         
-        sys.stdout.write(f"\r{self.prefix} {"[ " if self.frames else ""}{bar}{" ]" if self.frames else ""} {percent}%{eta}")
-        sys.stdout.flush()
+        self.console.print(f"\r{self.prefix} {"[ " if self.frames else ""}{bar}{" ]" if self.frames else ""} {percent}% {eta}")
 
     def stop(self):
         """

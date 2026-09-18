@@ -1,6 +1,6 @@
 import time
 from ttykit.status import Status, TaskState
-from ttykit._state import STATUS_ANIMATION
+from ttykit.data._state import STATUS_ANIMATION
 
 def show_all_spinners():
     for name in STATUS_ANIMATION.keys():

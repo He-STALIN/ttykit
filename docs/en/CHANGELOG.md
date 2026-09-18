@@ -15,7 +15,7 @@
 
 # Versions
 
-## [0.4.0] - 
+## [0.4.0] - 13 Sep 2026
 - Added ETA in `Progress`
 - Added new class `Tree` - create tree structure in terminal
 - Updated `Console.print()` - now you can use color and styles names in string.

@@ -1,5 +1,5 @@
 from typing import List
-from ttykit.console.console import Console
+from .console.console import Console
 
 class Tree:
     """Build tree and render in terminal

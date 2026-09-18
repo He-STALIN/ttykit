@@ -1,7 +1,7 @@
 from threading import Thread
 import time
-import sys
-from ._state import *
+from .data._state import *
+from .console.console import Console
 
 class Status:
     """
@@ -46,6 +46,7 @@ class Status:
         self.running = False
         self.animation_thread = None
         self.paused = False
+        self.console = Console()
 
     def __enter__(self):
         self.running = True
@@ -55,9 +56,9 @@ class Status:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.running = False
         time.sleep(0.1)
-        state_color = Colors.GREEN if self.state == TaskState.SUCCESS else Colors.RED if self.state == TaskState.ERROR else Colors.YELLOW
+        state_color = '[green]' if self.state == TaskState.SUCCESS else '[red]' if self.state == TaskState.ERROR else '[yellow]'
         state_text = "  OK  " if self.state == TaskState.SUCCESS else " FAIL " if self.state == TaskState.ERROR else " WARN "
-        print(f"\r[{state_color}{state_text}{RESET}] Loading {self._get_color()}{self.message}{RESET}")
+        self.console.print(f"\r[{state_color}{state_text}[/]] Loading {self._get_color()}{self.message}[/]")
 
     def _animate(self):
         def run():
@@ -65,8 +66,7 @@ class Status:
             while self.running:
                 if not self.paused:
                     frame = self.frames[i % len(self.frames)]
-                    print(f"\r{frame} Loading {self._get_color()}{self.message}{RESET}", end="")
-                    sys.stdout.flush()
+                    self.console.print(f"\r{frame}[/] Loading {self._get_color()}{self.message}[/]", end="")
                     i += 1
                 time.sleep(0.08)
         self.animation_thread = Thread(target=run, daemon=True)
