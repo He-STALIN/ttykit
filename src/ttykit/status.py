@@ -1,6 +1,8 @@
 from threading import Thread
+from typing import Literal
 import time
-from .data._state import *
+
+from .data._state import STATUS_ANIMATION, TaskState, Colors
 from .console.console import Console
 
 class Status:
@@ -37,7 +39,9 @@ class Status:
     [  OK  ] Loading Unit Test 9
     ```
     """
-    def __init__(self, message: str, spinner: str="bar", color="CYAN"):
+    def __init__(self, message: str,
+                spinner: Literal["bar", "ball", "dots", "dots12", "bouncingBar", "points", "wave", "pulse", "moon", "clock", "snake", "line", "box", "arc"]="bar",
+                color="CYAN"):
         self.message = message
         self.color = color
         self.spinner = spinner

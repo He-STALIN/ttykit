@@ -1,13 +1,14 @@
 """Helping made beatiful out in terminal"""
-
-from .progress import Progress
-from .status import Status
-from .data._state import TaskState, Colors, Styles, RESET
-from .tree import Tree
-from .console.console import Console
-from .console.TUI import TUI
 import traceback
 import sys
+
+from .data import TaskState, Colors, Styles, RESET
+from .console.console import Console
+from .console import input as Input
+from .progress import Progress
+from .console.TUI import TUI
+from .status import Status
+from .tree import Tree
 
 __colors__ = [
     Colors,
@@ -23,8 +24,16 @@ __all__ = [
     'Tree',
     'TUI',
     'get_console',
-    'set_custom_hook'
+    'set_custom_hook',
+    "Input",
+    __colors__
 ]
+
+__name__ = 'ttykit'
+__author__ = 'He-STALIN'
+__version__ = '0.5.0b'
+__license__ = 'MIT'
+
 
 console_inst: "Console" = None
 
@@ -72,8 +81,3 @@ def set_custom_hook(Traceback: bool=False) -> None:
     if Traceback:
         print('set custom excepthook...')
         sys.excepthook = custom_excepthook
-
-__name__ = 'ttykit'
-__author__ = 'He-STALIN'
-__version__ = '0.4.0'
-__license__ = 'MIT'

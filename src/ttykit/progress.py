@@ -1,4 +1,5 @@
-from .data._state import *
+from .data._state import BARS
+from typing import Literal
 import time
 from .console.console import Console
 
@@ -32,7 +33,7 @@ class Progress:
         Loading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40%
         ```
     """
-    def __init__(self, total: int=100, prefix: str=None, bar_length: int=30, bar_style='line', frames: bool=False, show_ETA: bool = True):
+    def __init__(self, total: int=100, prefix: str=None, bar_length: int=30, bar_style: Literal["line", "points", "blocks", "arrow"]='line', frames: bool=False, show_ETA: bool = True):
         self.total = total
         self.prefix = prefix if prefix else ""
         self.bar_length = bar_length

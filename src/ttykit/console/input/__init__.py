@@ -1,14 +1,14 @@
 from ttykit.data.const import WINDOWS
-from ttykit.data.dataclass import KeyEvent
+from ttykit.data import KeyEvent
 from typing import Callable
 
 
 if WINDOWS:
-    from ._windows import WindowsKeyboard as Keyboard
+    from ._windows import WindowsKeyboard as _Keyboard
 else:
-    from ._unix import UnixKeyboard as Keyboard
+    from ._unix import UnixKeyboard as _Keyboard
 
-_kb = Keyboard()
+_kb = _Keyboard()
 
 def get_vk_state(vk_code) -> bool:
     """Return state of key
@@ -60,6 +60,31 @@ def clear_all_hotkeys() -> None:
     """Reset all configured hotkeys"""
     _kb.clear_all_hotkey()
 
+
 def clear_hotkey(hotkey: str | KeyEvent) -> None:
     """Reset configured hotkey"""
     _kb.clear_hotkey(hotkey)
+
+
+def str_to_KeyEvent(hotkey: str) -> KeyEvent:
+    """Convert string representation to KeyEvent"""
+    _kb.str_to_KeyEvent(hotkey)
+
+
+def KeyEvent_to_str(hotkey: KeyEvent) -> str:
+    """Convert KeyEvent representation to string"""
+    _kb.KeyEvent_to_str(hotkey)
+
+
+__all__ = [
+    get_vk_state,
+    add_hotkey,
+    send,
+    release,
+    press,
+    get_key,
+    clear_all_hotkeys,
+    clear_hotkey,
+    str_to_KeyEvent,
+    KeyEvent_to_str
+]

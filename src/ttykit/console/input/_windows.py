@@ -1,12 +1,13 @@
+# system imports
+from ctypes import windll, byref, sizeof
 from typing import NoReturn, Callable
 from threading import Thread
-from ctypes import windll
 from time import sleep
 import msvcrt
 import re
-
-from ttykit.data.dataclass import KeyEvent
-from ttykit.data.const import EXTENDED_SYM
+# local imports
+from ttykit.data import KeyEvent, EXTENDED_SYM, VK_CODES
+from ttykit.data.const import INPUT, KEYBDINPUT
 
 _user32 = windll.user32
 
@@ -47,7 +48,7 @@ class WindowsKeyboard:
         while self._running:
             try:
                 if msvcrt.kbhit():
-                    final = None
+                    final: str = None
                     extended: bytes = None
                     key: bytes = msvcrt.getch()
                     modif: str = ""
@@ -81,6 +82,9 @@ class WindowsKeyboard:
                         if final == " ":
                             final = "space"
 
+                        if final == "\r":
+                            final = "enter"
+
                         final = modif + final.lower()
 
                     if final not in ["", None]:
@@ -100,10 +104,40 @@ class WindowsKeyboard:
             callback = self.hotkeys.get(self.now_key)
             callback()
 
+    def _send(self, HexCode, keyup=False):
+        try:
+            x = ""
+            if keyup:
+                x = INPUT(type=1, ki=KEYBDINPUT(wVk=HexCode, dwFlags=0x0002))
+            else:
+                x = INPUT(type=1, ki=KEYBDINPUT(wVk=HexCode))
+
+            _user32.SendInput(1, byref(x), sizeof(x))
+        except Exception as e:
+            raise e
+
+    def _split_hotkey(self, hotkey: str | KeyEvent) -> tuple[str, list[str]]:
+        if type(hotkey) == KeyEvent:
+            hotkey = self.KeyEvent_to_str(hotkey)
+
+        hotkey = re.sub(r"\s+", "", hotkey)
+        keys = hotkey.split("+")
+        key = keys[-1]
+        modificators = keys[:-1]
+        return key, modificators
+
+    def _key_to_vk(self, key: str) -> str:
+        if len(key) == 1:
+            return hex(ord(key))
+        else:
+            return VK_CODES.get(key, "")
+
+
+
     def get_vk_state(self, vk_code) -> bool:
         """Return State of key"""
         return (_user32.GetAsyncKeyState(vk_code) & 0x8000) != 0
-    
+
     def add_hotkey(self, hotkey: str | KeyEvent, callback: Callable) -> None:
         """Adds a hotkey that executes when pressed
         
@@ -114,19 +148,13 @@ class WindowsKeyboard:
                 The method that will be called.
         """
         if type(hotkey) == KeyEvent: #? checking type of hotkey
-            hotkey = str(
-                ("ctrl + " if hotkey.ctrl_key else "")
-                + ("shift + " if hotkey.shift_key else "")
-                + ("alt + " if hotkey.alt_key else "")
-                + ("meta + " if hotkey.meta_key else "") 
-                + hotkey.key
-            )
+            hotkey = self.KeyEvent_to_str(hotkey)
         elif type(hotkey) == str:
             keys = re.sub(r"\s+", "", hotkey) # clear all spaces
             keys = keys.split("+")
             hotkey =  " + ".join(keys)
         elif type(hotkey) not in [str, KeyEvent]:
-            raise ValueError(f"Argument 'hotkey' can be only 'str' or 'KeyEvent'. Not be {type(hotkey)}")
+            raise TypeError(f"Argument 'hotkey' can be only 'str' or 'KeyEvent'. Not be {type(hotkey)}")
 
 
         if not callable(callback): #? checking callback type
@@ -135,13 +163,56 @@ class WindowsKeyboard:
         self.hotkeys[hotkey] = callback
 
     def send(self, hotkey: str | KeyEvent) -> None:
-        pass
+        """Presses hotkey and releases"""
+        if type(hotkey) == KeyEvent: #? just in case
+            hotkey = self.KeyEvent_to_str(hotkey)
+        elif type(hotkey) == str:
+            hotkey = re.sub(r"\s+", "", hotkey)
+        elif type(hotkey) not in [str, KeyEvent]:
+            raise TypeError(f"Argument hotkey can be 'str' or 'KeyEvent'. Not be {type(hotkey)}")
+        
+        self.press(hotkey)
+        sleep(0.02) #? wait 20ms for processing
+        self.release(hotkey)
 
     def release(self, hotkey: str | KeyEvent) -> None:
-        pass
+        """Release the pressed hotkey"""
+        if type(hotkey) == KeyEvent:
+            hotkey = self.KeyEvent_to_str(hotkey)
+        elif type(hotkey) == str:
+            hotkey = re.sub(r"\s+", "", hotkey)
+        elif type(hotkey) not in [str, KeyEvent]:
+            raise TypeError(f"Argument hotkey can be 'str' or 'KeyEvent'. Not be {type(hotkey)}")
+
+        try:
+            main, modif = self._split_hotkey(hotkey)
+
+            self._send(self._key_to_vk(main), keyup=True) # release main key
+
+            for mod in reversed(modif): # release all modificators
+                self._send(self._key_to_vk(mod), keyup=True)
+        except Exception as e:
+            raise e
 
     def press(self, hotkey: str | KeyEvent) -> None:
-        pass
+        """Presses and holds hotkey"""
+        if type(hotkey) == KeyEvent:
+            hotkey = self.KeyEvent_to_str(hotkey)
+        elif type(hotkey) == str:
+            hotkey = re.sub(r"\s+", "", hotkey)
+        elif type(hotkey) not in [str, KeyEvent]:
+            raise TypeError(f"Argument hotkey can be 'str' or 'KeyEvent'. Not be {type(hotkey)}")
+
+        try:
+            main, modif = self._split_hotkey(hotkey)
+
+            for mod in modif:
+                self._send(self._key_to_vk(mod), keyup=False)
+
+            self._send(self._key_to_vk(main), keyup=False)
+
+        except Exception as e:
+            raise e
 
     def get_key(self) -> "KeyEvent":
         """Return the state of pressed key
@@ -174,6 +245,44 @@ class WindowsKeyboard:
         hotkey = " + ".join(keys)
 
         self.hotkeys.pop(hotkey)
+
+    def str_to_KeyEvent(hotkey: str) -> KeyEvent:
+        """Convert string representation to KeyEvent"""
+        if type(hotkey) != str:
+            raise TypeError(f"Argument 'hotkey' can be only 'str'. Not be {type(hotkey)}")
+
+        hotkey = re.sub(r"\s+", "", hotkey)
+        keys = hotkey.split("+")
+        key = ""
+
+        for iter in keys:
+            if len(iter) == 1:
+                key = iter
+                break
+
+        return KeyEvent(
+            key= key,
+            key_code= ord(key),
+            meta_key= True if "meta" in keys else False,
+            alt_key= True if "alt" in keys else False,
+            ctrl_key= True if "ctrl" in keys else False,
+            shift_key= True if "shift" in keys else False,
+            type= "key"
+        )
+
+    def KeyEvent_to_str(hotkey: KeyEvent) -> str:
+        """Convert KeyEvent representation to string"""
+        if type(hotkey) != KeyEvent:
+            raise TypeError(f"Argument 'hotkey' can be only 'Keyevent'. Not be {type(hotkey)}")
+
+        return str(
+            ("ctrl + " if hotkey.ctrl_key else "")
+            + ("shift + " if hotkey.shift_key else "")
+            + ("alt + " if hotkey.alt_key else "")
+            + ("meta + " if hotkey.meta_key else "") 
+            + hotkey.key
+        )
+
 
 
 

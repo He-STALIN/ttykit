@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# documentation
+README.pypi.md
+
 # Distribution / packaging
 .Python
 build/
