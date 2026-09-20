@@ -283,16 +283,3 @@ class WindowsKeyboard:
             + hotkey.key
         )
 
-
-
-
-if __name__ == '__main__':
-    kb = WindowsKeyboard()
-
-    def test_call():
-        print("work")
-
-    kb.add_hotkey("shift + g", test_call)
-
-    while True:
-        pass
