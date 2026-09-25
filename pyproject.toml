@@ -16,7 +16,7 @@ authors = [
     {email = "hene.stalin@gmail.com"}
     ]
 license = {file = "LICENSE"}
-readme = "README.md"
+readme = "README.pypi.md"
 keywords = ['tty', 'terminal', 'formatting']
 dependencies = ["keyboard"]
 

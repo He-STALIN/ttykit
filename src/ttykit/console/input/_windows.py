@@ -8,6 +8,7 @@ import re
 # local imports
 from ttykit.data import KeyEvent, EXTENDED_SYM, VK_CODES
 from ttykit.data.const import INPUT, KEYBDINPUT
+from ._local import KeyEvent_to_str, str_to_KeyEvent
 
 _user32 = windll.user32
 
@@ -35,7 +36,7 @@ class WindowsKeyboard:
 
             self._thread.start()
         except Exception as e:
-            raise Exception(e)
+            raise e
 
     def _stop(self) -> None:
         self._running = False
@@ -118,7 +119,7 @@ class WindowsKeyboard:
 
     def _split_hotkey(self, hotkey: str | KeyEvent) -> tuple[str, list[str]]:
         if type(hotkey) == KeyEvent:
-            hotkey = self.KeyEvent_to_str(hotkey)
+            hotkey = KeyEvent_to_str(hotkey)
 
         hotkey = re.sub(r"\s+", "", hotkey)
         keys = hotkey.split("+")
@@ -148,7 +149,7 @@ class WindowsKeyboard:
                 The method that will be called.
         """
         if type(hotkey) == KeyEvent: #? checking type of hotkey
-            hotkey = self.KeyEvent_to_str(hotkey)
+            hotkey = KeyEvent_to_str(hotkey)
         elif type(hotkey) == str:
             keys = re.sub(r"\s+", "", hotkey) # clear all spaces
             keys = keys.split("+")
@@ -165,7 +166,7 @@ class WindowsKeyboard:
     def send(self, hotkey: str | KeyEvent) -> None:
         """Presses hotkey and releases"""
         if type(hotkey) == KeyEvent: #? just in case
-            hotkey = self.KeyEvent_to_str(hotkey)
+            hotkey = KeyEvent_to_str(hotkey)
         elif type(hotkey) == str:
             hotkey = re.sub(r"\s+", "", hotkey)
         elif type(hotkey) not in [str, KeyEvent]:
@@ -178,7 +179,7 @@ class WindowsKeyboard:
     def release(self, hotkey: str | KeyEvent) -> None:
         """Release the pressed hotkey"""
         if type(hotkey) == KeyEvent:
-            hotkey = self.KeyEvent_to_str(hotkey)
+            hotkey = KeyEvent_to_str(hotkey)
         elif type(hotkey) == str:
             hotkey = re.sub(r"\s+", "", hotkey)
         elif type(hotkey) not in [str, KeyEvent]:
@@ -197,7 +198,7 @@ class WindowsKeyboard:
     def press(self, hotkey: str | KeyEvent) -> None:
         """Presses and holds hotkey"""
         if type(hotkey) == KeyEvent:
-            hotkey = self.KeyEvent_to_str(hotkey)
+            hotkey = KeyEvent_to_str(hotkey)
         elif type(hotkey) == str:
             hotkey = re.sub(r"\s+", "", hotkey)
         elif type(hotkey) not in [str, KeyEvent]:
@@ -245,41 +246,4 @@ class WindowsKeyboard:
         hotkey = " + ".join(keys)
 
         self.hotkeys.pop(hotkey)
-
-    def str_to_KeyEvent(hotkey: str) -> KeyEvent:
-        """Convert string representation to KeyEvent"""
-        if type(hotkey) != str:
-            raise TypeError(f"Argument 'hotkey' can be only 'str'. Not be {type(hotkey)}")
-
-        hotkey = re.sub(r"\s+", "", hotkey)
-        keys = hotkey.split("+")
-        key = ""
-
-        for iter in keys:
-            if len(iter) == 1:
-                key = iter
-                break
-
-        return KeyEvent(
-            key= key,
-            key_code= ord(key),
-            meta_key= True if "meta" in keys else False,
-            alt_key= True if "alt" in keys else False,
-            ctrl_key= True if "ctrl" in keys else False,
-            shift_key= True if "shift" in keys else False,
-            type= "key"
-        )
-
-    def KeyEvent_to_str(hotkey: KeyEvent) -> str:
-        """Convert KeyEvent representation to string"""
-        if type(hotkey) != KeyEvent:
-            raise TypeError(f"Argument 'hotkey' can be only 'Keyevent'. Not be {type(hotkey)}")
-
-        return str(
-            ("ctrl + " if hotkey.ctrl_key else "")
-            + ("shift + " if hotkey.shift_key else "")
-            + ("alt + " if hotkey.alt_key else "")
-            + ("meta + " if hotkey.meta_key else "") 
-            + hotkey.key
-        )
 
