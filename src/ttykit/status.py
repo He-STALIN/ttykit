@@ -1,9 +1,9 @@
-from threading import Thread
-from typing import Literal
-import time
+from threading import Thread as _Thread
+from typing import Literal as _Literal
+import time as _time
 
 from .data._state import STATUS_ANIMATION, TaskState, Colors
-from .console.console import Console
+from .console.console import Console as _Console
 
 class Status:
     """
@@ -40,7 +40,7 @@ class Status:
     ```
     """
     def __init__(self, message: str,
-                spinner: Literal["bar", "ball", "dots", "dots12", "bouncingBar", "points", "wave", "pulse", "moon", "clock", "snake", "line", "box", "arc"]="bar",
+                spinner: _Literal["bar", "ball", "dots", "dots12", "bouncingBar", "points", "wave", "pulse", "moon", "clock", "snake", "line", "box", "arc"]="bar",
                 color="CYAN"):
         self.message = message
         self.color = color
@@ -48,9 +48,9 @@ class Status:
         self.state = TaskState.RUNNING
         self.frames = STATUS_ANIMATION.get(self.spinner, STATUS_ANIMATION['bar'])
         self.running = False
-        self.animation_thread = None
+        self.animation_thread: _Thread = None
         self.paused = False
-        self.console = Console()
+        self.console = _Console()
 
     def __enter__(self):
         self.running = True
@@ -59,7 +59,7 @@ class Status:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.running = False
-        time.sleep(0.1)
+        _time.sleep(0.1)
         state_color = '[green]' if self.state == TaskState.SUCCESS else '[red]' if self.state == TaskState.ERROR else '[yellow]'
         state_text = "  OK  " if self.state == TaskState.SUCCESS else " FAIL " if self.state == TaskState.ERROR else " WARN "
         self.console.print(f"\r[{state_color}{state_text}[/]] Loading {self._get_color()}{self.message}[/]")
@@ -72,8 +72,8 @@ class Status:
                     frame = self.frames[i % len(self.frames)]
                     self.console.print(f"\r{frame}[/] Loading {self._get_color()}{self.message}[/]", end="")
                     i += 1
-                time.sleep(0.08)
-        self.animation_thread = Thread(target=run, daemon=True)
+                _time.sleep(0.08)
+        self.animation_thread = _Thread(target=run, daemon=True)
         self.animation_thread.start()
 
     def _get_color(self):

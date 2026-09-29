@@ -1,5 +1,5 @@
-from typing import List
-from .console.console import Console
+from typing import List as _List
+from .console.console import Console as _Console
 
 class Tree:
     """Build tree and render in terminal
@@ -17,8 +17,8 @@ class Tree:
     """
     def __init__(self, label: str):
         self.label = label
-        self.children: List["Tree"] = []
-        self.console = Console()
+        self.children: _List["Tree"] = []
+        self.console = _Console()
 
     def add(self, label: str) -> "Tree":
         """Adding child tree in current tree"""

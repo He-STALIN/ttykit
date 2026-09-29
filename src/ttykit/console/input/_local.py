@@ -1,7 +1,7 @@
-from ttykit.data import KeyEvent
+from ttykit.data import KeyEvent as _KeyEvent
 import re
 
-def str_to_KeyEvent(hotkey: str) -> "KeyEvent":
+def str_to_KeyEvent(hotkey: str) -> "_KeyEvent":
     """Convert string representation to KeyEvent"""
     if type(hotkey) != str:
         raise TypeError(f"Argument 'hotkey' can be only 'str'. Not be {type(hotkey)}")
@@ -15,7 +15,7 @@ def str_to_KeyEvent(hotkey: str) -> "KeyEvent":
             key = iter
             break
     
-    return KeyEvent(
+    return _KeyEvent(
         key= key,
         key_code= ord(key),
         meta_key= True if "meta" in keys else False,
@@ -25,10 +25,10 @@ def str_to_KeyEvent(hotkey: str) -> "KeyEvent":
         type= "key"
     )
 
-def KeyEvent_to_str(hotkey: KeyEvent) -> str:
+def KeyEvent_to_str(hotkey: _KeyEvent) -> str:
     """Convert KeyEvent representation to string"""
-    if type(hotkey) != KeyEvent:
-        raise TypeError(f"Argument 'hotkey' can be only 'Keyevent'. Not be {type(hotkey)}")
+    if type(hotkey) != _KeyEvent:
+        raise TypeError(f"Argument 'hotkey' can be only 'KeyEvent'. Not be {type(hotkey)}")
 
     return str(
         ("ctrl + " if hotkey.ctrl_key else "")

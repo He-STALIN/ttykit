@@ -41,7 +41,7 @@ class INPUT(ctypes.Structure):
         ("_input", _INPUT),
     ]
 
-EXTENDED_SYM: dict[str, str] = {
+WIN_EXTENDED_SYM: dict[str, str] = {
     "H": "UpArrow",
     "P": "DownArrow",
     "K": "LeftArrow",
@@ -65,6 +65,39 @@ EXTENDED_SYM: dict[str, str] = {
     "D": "F10",
     "": "F11",
     "": "F12",
+}
+
+UNIX_EXTENDED_SYM: dict[str, str] = {
+    # Стрелки
+    '\x1b[A': 'UpArrow',
+    '\x1b[B': 'DownArrow',
+    '\x1b[C': 'RightArrow',
+    '\x1b[D': 'LeftArrow',
+    # F1–F4 (SS3-последовательности)
+    '\x1bOP': 'F1',
+    '\x1bOQ': 'F2',
+    '\x1bOR': 'F3',
+    '\x1bOS': 'F4',
+    # F5–F12 (CSI-последовательности)
+    '\x1b[15~': 'F5',
+    '\x1b[17~': 'F6',
+    '\x1b[18~': 'F7',
+    '\x1b[19~': 'F8',
+    '\x1b[20~': 'F9',
+    '\x1b[21~': 'F10',
+    '\x1b[23~': 'F11',
+    '\x1b[24~': 'F12',
+    # Прочие спецклавиши
+    '\x1b[H': 'Home',
+    '\x1b[F': 'End',
+    '\x1b[2~': 'Insert',
+    '\x1b[3~': 'Delete',
+    '\x1b[5~': 'PageUp',
+    '\x1b[6~': 'PageDown',
+    # Простые символы
+    '\x1b': 'ESC',
+    '\t': 'TAB',
+    '\x7f': 'BackSpace'
 }
 
 class VK_CODES:

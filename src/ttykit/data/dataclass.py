@@ -1,8 +1,8 @@
-from dataclasses import dataclass
-from typing import Literal
+from dataclasses import dataclass as _dataclass
+from typing import Literal as _Literal
 
 
-@dataclass(frozen=True)
+@_dataclass(frozen=True)
 class KeyEvent:
     key: str
     key_code: int
@@ -10,4 +10,4 @@ class KeyEvent:
     alt_key: bool = False
     ctrl_key: bool = False
     shift_key: bool = False
-    type: Literal["key", "interrupt"] = "key"
+    type: _Literal["key", "interrupt"] = "key"

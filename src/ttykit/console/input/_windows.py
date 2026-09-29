@@ -6,8 +6,9 @@ from time import sleep
 import msvcrt
 import re
 # local imports
-from ttykit.data import KeyEvent, EXTENDED_SYM, VK_CODES
+from ttykit.data import KeyEvent, WIN_EXTENDED_SYM, VK_CODES
 from ttykit.data.const import INPUT, KEYBDINPUT
+from ttykit.utils import *
 from ._local import KeyEvent_to_str, str_to_KeyEvent
 
 _user32 = windll.user32
@@ -60,7 +61,7 @@ class WindowsKeyboard:
                     if key in [b"\x00", b"\xe0"]:
                         extended = msvcrt.getch()
                         final = extended.decode(encoding="utf-8", errors="ignore")
-                        final = final.replace(final, EXTENDED_SYM.get(final, ""))
+                        final = final.replace(final, WIN_EXTENDED_SYM.get(final, ""))
                     else:
                         final = key.decode(encoding="utf-8", errors="ignore")
                         if self.get_vk_state(0x11):
@@ -159,7 +160,7 @@ class WindowsKeyboard:
 
 
         if not callable(callback): #? checking callback type
-            raise TypeError("Argument 'callback' must be callable")
+            raise CallableError("Argument 'callback' must be callable")
 
         self.hotkeys[hotkey] = callback
 

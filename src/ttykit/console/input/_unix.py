@@ -4,42 +4,11 @@ from typing import Callable
 from time import sleep
 import re
 
-from ttykit.data import KeyEvent
+from ttykit.data import KeyEvent, UNIX_EXTENDED_SYM
+from ttykit.utils import *
 from ._local import KeyEvent_to_str, str_to_KeyEvent
 
 
-# Карта escape-последовательностей → понятные имена
-LINUX_KEY_MAP = {
-    # Стрелки
-    '\x1b[A': 'UP',
-    '\x1b[B': 'DOWN',
-    '\x1b[C': 'RIGHT',
-    '\x1b[D': 'LEFT',
-    # F1–F4 (SS3-последовательности)
-    '\x1bOP': 'F1',
-    '\x1bOQ': 'F2',
-    '\x1bOR': 'F3',
-    '\x1bOS': 'F4',
-    # F5–F12 (CSI-последовательности)
-    '\x1b[15~': 'F5',
-    '\x1b[17~': 'F6',
-    '\x1b[18~': 'F7',
-    '\x1b[19~': 'F8',
-    '\x1b[20~': 'F9',
-    '\x1b[21~': 'F10',
-    '\x1b[23~': 'F11',
-    '\x1b[24~': 'F12',
-    # Прочие спецклавиши
-    '\x1b[H': 'HOME',
-    '\x1b[F': 'END',
-    '\x1b[2~': 'INSERT',
-    '\x1b[3~': 'DELETE',
-    '\x1b[5~': 'PAGEUP',
-    '\x1b[6~': 'PAGEDOWN',
-    # Простые символы
-    '\x1b': 'ESC',
-    '\t': 'TAB'
-}
 
 class UnixKeyboard:
     def __init__(self):
@@ -75,40 +44,63 @@ class UnixKeyboard:
             self._thread.join(timeout=1)
             self._thread = None
 
+        termios.tcsetattr(self.fd, termios.TCSADRAIN, self.old_term)
+
     def _event_loop(self):
         while self._running:
             try:
                 tty.setcbreak(self.fd)
 
                 if select.select([sys.stdin], [], [], 0.1)[0]:
-                    key = os.read(self.fd, 1) #sys.stdin.read(1)
+                    key = os.read(self.fd, 1).decode() #sys.stdin.read(1)
 
                     if key in [None, ""]:
                         continue
 
-                    if key in ["\x1b", "\t"]:
-                        if key == "\x1b":
-                            if select.select([sys.stdin], [], [], 0.1):
-                                key += os.read(self.fd, 1)
 
-                                if select.select([sys.stdin], [], [], 0.1):
-                                    key += os.read(self.fd, 1) #sys.stdin.read(1)
+                    if key == "\x1b":
+                        if select.select([sys.stdin], [], [], 0.15)[0]:
+                            key += os.read(self.fd, 1).decode()
 
-                                    if select.select([sys.stdin], [], [], 0.1):
-                                        key += os.read(self.fd, 1) #sys.stdin.read(1)
-                        else:
-                            self.now_key = LINUX_KEY_MAP.get(key, key)
-                            self.now_key = key
+                            if select.select([sys.stdin], [], [], 0.1)[0]:
+                                key += os.read(self.fd, 1).decode()
 
-                    print(fr"{list(self.now_key)}")
+                                if select.select([sys.stdin], [], [], 0.1)[0]:
+                                    key += os.read(self.fd, 1).decode()
+                        # seq = b""
+                        # while True:
+                        #     r, _, _ = select.select([self.fd], [], [], 0.1)
+                        #     if not r:
+                        #         break  # таймаут — возвращаем то, что есть
+                        #     byte = os.read(self.fd, 1)
+                        #     seq += byte
+                        #     # Проверяем: это финальный байт?
+                        #     if seq.startswith(b"\x1bO") and len(seq) == 3:
+                        #         break  # SS3: \x1bO + буква
+                        #     if seq.startswith(b"\x1b[") and seq[-1:].isalpha() or seq[-1:] == b"~":
+                        #         break  # CSI: \x1b[ ... финальная буква
+                        #     if seq == b"\x1b":
+                        #         continue  # ждём следующий байт
+
+                        # key = key + seq.decode()
+                    
+                    print(repr(key))
+
+                    if key == " ":
+                        key = "Space"
+
+                    self.now_key = UNIX_EXTENDED_SYM.get(key, key)
+
+                    print(f"{list(self.now_key)}")
 
                     self._run_hotkey()
+            except KeyboardInterrupt:
+                self._stop()
             except Exception as e:
                 raise e
             finally:
                 termios.tcsetattr(self.fd, termios.TCSADRAIN, self.old_term)
                 sleep(0.01)
-
 
     def _run_hotkey(self):
         if self.now_key in self.hotkeys.keys():
@@ -137,7 +129,7 @@ class UnixKeyboard:
         
         
         if not callable(callback): #? checking callback type
-            raise TypeError("Argument 'callback' must be callable")
+            raise CallableError("Argument 'callback' must be callable")
         
         self.hotkeys[hotkey] = callback
 

@@ -2,31 +2,25 @@
 import traceback
 import sys
 
-from .data import TaskState, Colors, Styles, RESET
 from .console.console import Console
 from .console import input as Input
 from .progress import Progress
 from .console.TUI import TUI
 from .status import Status
 from .tree import Tree
+from . import data
 
-__colors__ = [
-    Colors,
-    Styles,
-    RESET
-]
 
 __all__ = [
     'Progress',
     'Status',
-    'TaskState',
+    'data',
     'Console',
     'Tree',
     'TUI',
-    'get_console',
-    'set_custom_hook',
     "Input",
-    __colors__
+    'get_console',
+    'set_custom_hook'
 ]
 
 __name__ = 'ttykit'
@@ -56,8 +50,8 @@ def custom_excepthook(exc_type, exc_value, exc_tb):
     
     # Рамка
     print(f"╔{'═' * (max_len + 4)}╗")
-    print(f"║  {Colors.RED}{error_line.ljust(max_len)}{RESET}  ║")
-    print(f"║  {Colors.RED}{msg_line.ljust(max_len)}{RESET}  ║")
+    print(f"║  {data.Colors.RED}{error_line.ljust(max_len)}{data.RESET}  ║")
+    print(f"║  {data.Colors.RED}{msg_line.ljust(max_len)}{data.RESET}  ║")
     print(f"╠{'═' * (max_len + 4)}╣")
     
     for line in tb_lines[-3:]:
