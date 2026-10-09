@@ -12,3 +12,7 @@ class RenderError(TTYError):
 
 class CallableError(TTYError):
     """Raised when type not is callable"""
+
+
+class SupportError(TTYError):
+    """Raised when something logic not support"""

@@ -224,7 +224,6 @@ class WindowsKeyboard:
         """
         splited_key = self.now_key.split(" + ") #? split & clear from plus with spaces
         key = splited_key.pop()
-        print(splited_key)
         return KeyEvent(
             key = key,
             key_code = ord(key),
@@ -235,7 +234,7 @@ class WindowsKeyboard:
             type = "key"
         )
 
-    def clear_all_hotkey(self) -> None:
+    def clear_all_hotkeys(self) -> None:
         """Reset all configured hotkeys"""
         self.hotkeys.clear()
         self.hotkeys = {} #? if "clear()" didn't work

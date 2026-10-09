@@ -1,6 +1,30 @@
-"""Helping made beatiful out in terminal"""
-import traceback
-import sys
+"""
+        ttykit
+=-=-=-=-=-=-=-=-=-=-=-
+Helps produce attractive terminal output.
+
+Author: He-STALIN
+License: MIT License
+
+Available imports:
+    ├─ Classes:
+    │     + Progress
+    │     + Status
+    │     + Tree
+    │     + Console
+    ├─ Submodules:
+    │     + data
+    │     - Input
+    │     + utils
+    ├─ Methods:
+    │     + get_console
+    └─ In dev/un-ready:
+        - TUI (class)
+        - Input (submodule)
+
+Documentation you can see here:
+    https://github.com/He-STALIN/ttykit/tree/main/docs
+"""
 
 from .console.console import Console
 from .console import input as Input
@@ -8,7 +32,7 @@ from .progress import Progress
 from .console.TUI import TUI
 from .status import Status
 from .tree import Tree
-from . import data
+from . import data, utils
 
 
 __all__ = [
@@ -20,7 +44,7 @@ __all__ = [
     'TUI',
     "Input",
     'get_console',
-    'set_custom_hook'
+    'utils'
 ]
 
 __name__ = 'ttykit'
@@ -39,39 +63,3 @@ def get_console() -> 'Console':
     else:
         console_inst = Console()
         return console_inst
-
-def custom_excepthook(exc_type, exc_value, exc_tb):
-    tb_lines = traceback.format_exception(exc_type, exc_value, exc_tb)
-    
-    # Самая длинная строка
-    error_line = f"Error: {exc_type.__name__}"
-    msg_line = f"Message: {exc_value}"
-    max_len = max(len(error_line), len(msg_line), 40)
-    
-    # Рамка
-    print(f"╔{'═' * (max_len + 4)}╗")
-    print(f"║  {data.Colors.RED}{error_line.ljust(max_len)}{data.RESET}  ║")
-    print(f"║  {data.Colors.RED}{msg_line.ljust(max_len)}{data.RESET}  ║")
-    print(f"╠{'═' * (max_len + 4)}╣")
-    
-    for line in tb_lines[-3:]:
-        clean = line.strip()
-        if len(clean) > max_len:
-            clean = clean[:max_len-3] + "..."
-        print(f"║  {clean.ljust(max_len)}  ║")
-    
-    print(f"╚{'═' * (max_len + 4)}╝")
-
-def set_custom_hook(Traceback: bool=False) -> None:
-    """
-    Set a custom methods
-
-    Args:
-        Traceback (bool): replace Traceback on custom or not. Default `False`
-    """
-
-    print("[WARNING] this method 'set_custom_hook' unstable and may not working")
-
-    if Traceback:
-        print('set custom excepthook...')
-        sys.excepthook = custom_excepthook

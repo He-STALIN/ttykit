@@ -1,10 +1,11 @@
+from typing import Optional, Literal, Mapping
+from getpass import getpass
+import warnings
 import sys
 import os
-from typing import Optional, Literal, Mapping
-from ttykit.segmentation import Segmentation
-from getpass import getpass
 
-from ..data.const import ColorSystem, WINDOWS
+from ttykit.data.const import ColorSystem, WINDOWS
+from ttykit.segmentation import Segmentation
 
 class Console:
     """
@@ -52,7 +53,7 @@ class Console:
                 size = os.get_terminal_size()
                 self.width = size.columns
             except OSError:
-                print('Error calculating width of the terminal. Use default value (80)')
+                warnings.warn('Error calculating width of the terminal. Use default value (80)', UserWarning)
                 self.width = 80
 
         if self.height is None:
@@ -60,8 +61,8 @@ class Console:
                 size = os.get_terminal_size()
                 self.height = size.lines
             except OSError:
-                print('Error calculating height of the terminal. Use default value (24)')
-                self.height
+                warnings.warn('Error calculating height of the terminal. Use default value (24)', UserWarning)
+                self.height = 24
 
     def _print_error(self, msg: str=None):
         if msg is None:
@@ -69,6 +70,10 @@ class Console:
 
         if self.stderr:
             sys.stderr.write(msg)
+        else:
+            sys.stdout.write(msg)
+
+        sys.stdout.flush()
 
     @property
     def isTerminal(self) -> bool:
@@ -78,16 +83,16 @@ class Console:
         Returns:
             state (bool): return `True` if console is understanding escape sequences, otherwise `False`
         """
-        if self._force_terminal is not None:
+        if self._force_terminal not in [None, False]:
             return True
 
         if hasattr(sys.stdin, "__module__") and sys.stdin.__module__.startswith("idlelib"):
             return False #? return False for idle which claims to be a tty but can't handle ANSI codes
 
-        ttyCompatyble = self._environ.get('TTY_COMPATIBLE', '')
-        if ttyCompatyble == '0': #? 0 = device is not tty compatible
+        ttyCompatible = self._environ.get('TTY_COMPATIBLE', '')
+        if ttyCompatible == '0': #? 0 = device is not tty compatible
             return False
-        elif ttyCompatyble =='1': #? 1 = device is tty compatible
+        elif ttyCompatible =='1': #? 1 = device is tty compatible
             return True
 
         if not sys.stdout.isatty():
@@ -132,14 +137,14 @@ class Console:
             return ColorSystem.STANDARD
 
     def bell(self):
-        sys.stdout.write("\a")
+        sys.stdout.write("\x07")
         sys.stdout.flush()
 
     def print(self,
             *args,
             sep: Optional[str] =" ",
             end: Optional[str] ="\n",
-            justify: str = "left",
+            justify: Literal["left", "center", "right"] = "left",
             fillchar: str = " "
             ) -> None:
         """
@@ -159,7 +164,7 @@ class Console:
                 print("[blue] This is test string")
 
             output:
-                <div style="color: blue;"> This is test string</div>
+                This is test string
         """
         if not self.isTerminal or self.no_color:
             #? Just out, without colors or styles
@@ -207,8 +212,45 @@ class Console:
             self.print(prompt, end='', justify=justify, fillchar=fillchar)
 
         if password:
-            # TODO: realize text hidding
             result = getpass(prompt='')
         else:
             result = input()
         return result
+
+    def set_cursor(self, width: int, height: int):
+        """Set terminal cursor to coordinates"""
+        if not type(width) == int:
+            raise TypeError(f"Argument 'width' can be only 'int', not be {type(width)}")
+        if not type(height) == int:
+            raise TypeError(f"Argument 'height' can be only 'int', not be {type(height)}")
+
+        if width > self.width:
+            raise ValueError(f"Argument 'width' cannot exceed the terminal width, but '{width}' was received")
+
+        if height > self.height:
+            raise ValueError(f"Argument 'height' cannot exceed the terminal height, but '{height}' was received")
+
+        sys.stdout.write(f'\x1b[{height};{width}H')
+        sys.stdout.flush()
+
+    def set_alt_screen(self, enable: bool = True):
+        """Set alternative screen of terminal"""
+        if self.isTerminal:
+            if enable:
+                sys.stdout.write('\x1b[?1049h') #? high - enable
+                sys.stdout.flush()
+            else:
+                sys.stdout.write('\x1b[?1049l') #? low - disable
+                sys.stdout.flush()
+
+    def set_window_title(self, title: str):
+        """Sets the window title
+        
+        Warning: some terminal (ex. `fish`) reset title before and after command executing"""
+
+        if not type(title) == str:
+            raise TypeError(f"Argument 'title' must be type of 'str'")
+
+        if self.isTerminal:
+            sys.stdout.write(f"\x1b]0;{title}\x07")
+            sys.stdout.flush()

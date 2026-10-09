@@ -1,5 +1,5 @@
 from threading import Thread as _Thread
-from typing import Literal as _Literal
+from typing import Literal
 import time as _time
 
 from .data._state import STATUS_ANIMATION, TaskState, Colors
@@ -28,19 +28,19 @@ class Status:
     ```
     ### out when task1
     ```
-    ⠀⢙ Loading Unit Test 8
+    ⠀⢙ Unit Test 8
     ```
     ### out when task2
     ```
-    ⢀⠀ Loading Unit Test 9
+    ⢀⠀ Unit Test 9
     ```
     ### out when finished
     ```
-    [  OK  ] Loading Unit Test 9
+    [  OK  ] Unit Test 9
     ```
     """
     def __init__(self, message: str,
-                spinner: _Literal["bar", "ball", "dots", "dots12", "bouncingBar", "points", "wave", "pulse", "moon", "clock", "snake", "line", "box", "arc"]="bar",
+                spinner: Literal["bar", "ball", "dots", "dots12", "bouncingBar", "points", "wave", "pulse", "moon", "clock", "snake", "line", "box", "arc"]="bar",
                 color="CYAN"):
         self.message = message
         self.color = color
@@ -62,7 +62,7 @@ class Status:
         _time.sleep(0.1)
         state_color = '[green]' if self.state == TaskState.SUCCESS else '[red]' if self.state == TaskState.ERROR else '[yellow]'
         state_text = "  OK  " if self.state == TaskState.SUCCESS else " FAIL " if self.state == TaskState.ERROR else " WARN "
-        self.console.print(f"\r[{state_color}{state_text}[/]] Loading {self._get_color()}{self.message}[/]")
+        self.console.print(f"\r[{state_color}{state_text}[/]] {self._get_color()}{self.message}[/]")
 
     def _animate(self):
         def run():

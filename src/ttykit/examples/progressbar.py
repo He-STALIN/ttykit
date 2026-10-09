@@ -4,9 +4,10 @@ from time import sleep
 
 def show_all_bars():
     for name in BARS.keys():
+        print(f"-===[ {name} ]===-")
         with Progress(total=100, prefix="Test Bar", bar_style=name) as bar:
-            sleep(2)
             bar.advance(25)
+            sleep(2)
 
 
 if __name__ == "__main__":

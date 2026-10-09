@@ -61,6 +61,9 @@ class Progress:
             self.current = min(value, self.total)
             self._render()
 
+            if self.current == self.total:
+                self.finished = True
+
     def advance(self, step: int=1):
         """
         increase state on some steps
@@ -84,7 +87,7 @@ class Progress:
             hours, minutes = divmod(minutes, 60)
             eta = f"ETA: {int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
         
-        self.console.print(f"\r{self.prefix} {"[ " if self.frames else ""}{bar}{" ]" if self.frames else ""} {percent}% {eta}")
+        self.console.print(f"\r {self.prefix} {"[ " if self.frames else ""}{bar}{" ]" if self.frames else ""} {percent}% {eta}", end="")
 
     def stop(self):
         """

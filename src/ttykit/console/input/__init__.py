@@ -1,19 +1,25 @@
-from ttykit.data import KeyEvent as _KeyEvent
 from typing import Callable as _Callable
-from ._local import str_to_KeyEvent, KeyEvent_to_str
 import platform as _platform
+from warnings import warn
 
+from ._local import str_to_KeyEvent, KeyEvent_to_str
+from ttykit.utils import InputWarning, SupportError
+from ttykit.data import KeyEvent as _KeyEvent
 
 if _platform.system() == "Windows":
     from ._windows import WindowsKeyboard as _Keyboard
 elif _platform.system() == "Linux":
     from ._unix import UnixKeyboard as _Keyboard
-    print(Warning("Keyboard Event not fully completed"))
+    warn(
+        "Unix-related keyboard reader not fully made and may contain critical bugs",
+        InputWarning,
+        stacklevel=2
+    )
 # elif _platform.system() == "Darwin":
 else:
-    raise OSError(f"Unsupported operating system: {_platform.system()}")
+    raise SupportError(f"Unsupported operating system: {_platform.system()}")
 
-_kb = _Keyboard()
+_kb = None
 
 def add_hotkey(hotkey: str | _KeyEvent, callback: _Callable) -> None:
     """Adds a hotkey that executes when pressed
@@ -24,41 +30,49 @@ def add_hotkey(hotkey: str | _KeyEvent, callback: _Callable) -> None:
         callback (Callable):
             The method that will be called
     """
-    _kb.add_hotkey(hotkey=hotkey, callback=callback)
+    _get_kb().add_hotkey(hotkey=hotkey, callback=callback)
 
 
 def send(hotkey: str | _KeyEvent) -> None:
     """Send hotkey press and release"""
-    _kb.send(hotkey)
+    _get_kb().send(hotkey)
 
 
 def release(hotkey: str | _KeyEvent) -> None:
     """Release pressed key"""
-    _kb.release(hotkey)
+    _get_kb().release(hotkey)
 
 
 def press(hotkey: str | _KeyEvent) -> None:
     """presses and holds the key"""
-    _kb.press(hotkey)
+    _get_kb().press(hotkey)
 
 
 def get_key() -> "_KeyEvent":
     """Returns the pressed key"""
-    return _kb.get_key()
+    return _get_kb().get_key()
 
 
 def clear_all_hotkeys() -> None:
     """Reset all configured hotkeys"""
-    _kb.clear_all_hotkey()
+    _get_kb().clear_all_hotkeys()
 
 
 def clear_hotkey(hotkey: str | _KeyEvent) -> None:
     """Reset configured hotkey"""
-    _kb.clear_hotkey(hotkey)
+    _get_kb().clear_hotkey(hotkey)
 
+
+def _get_kb():
+    global _kb
+    if _kb is None:
+        _kb = _Keyboard()
+        return _kb
+    else:
+        return _kb
 
 __all__ = [
-    'add_hotkey,'
+    'add_hotkey',
     'send',
     'release',
     'press',

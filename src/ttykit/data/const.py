@@ -2,6 +2,7 @@ from enum import IntEnum
 import ctypes
 from ctypes.wintypes import WORD, DWORD, ULONG
 import sys
+from functools import cache
 
 WINDOWS = sys.platform == "win32"
 
@@ -67,37 +68,88 @@ WIN_EXTENDED_SYM: dict[str, str] = {
     "": "F12",
 }
 
+
 UNIX_EXTENDED_SYM: dict[str, str] = {
     # Стрелки
-    '\x1b[A': 'UpArrow',
-    '\x1b[B': 'DownArrow',
-    '\x1b[C': 'RightArrow',
-    '\x1b[D': 'LeftArrow',
+    b'\x1b[A': 'UpArrow',
+    b'\x1b[B': 'DownArrow',
+    b'\x1b[C': 'RightArrow',
+    b'\x1b[D': 'LeftArrow',
     # F1–F4 (SS3-последовательности)
-    '\x1bOP': 'F1',
-    '\x1bOQ': 'F2',
-    '\x1bOR': 'F3',
-    '\x1bOS': 'F4',
+    b'\x1bOP': 'F1',
+    b'\x1bOQ': 'F2',
+    b'\x1bOR': 'F3',
+    b'\x1bOS': 'F4',
     # F5–F12 (CSI-последовательности)
-    '\x1b[15~': 'F5',
-    '\x1b[17~': 'F6',
-    '\x1b[18~': 'F7',
-    '\x1b[19~': 'F8',
-    '\x1b[20~': 'F9',
-    '\x1b[21~': 'F10',
-    '\x1b[23~': 'F11',
-    '\x1b[24~': 'F12',
+    b'\x1b[15~': 'F5',
+    b'\x1b[17~': 'F6',
+    b'\x1b[18~': 'F7',
+    b'\x1b[19~': 'F8',
+    b'\x1b[20~': 'F9',
+    b'\x1b[21~': 'F10',
+    b'\x1b[23~': 'F11',
+    b'\x1b[24~': 'F12',
     # Прочие спецклавиши
-    '\x1b[H': 'Home',
-    '\x1b[F': 'End',
-    '\x1b[2~': 'Insert',
-    '\x1b[3~': 'Delete',
-    '\x1b[5~': 'PageUp',
-    '\x1b[6~': 'PageDown',
+    b'\x1b[H': 'Home',
+    b'\x1b[F': 'End',
+    b'\x1b[2~': 'Insert',
+    b'\x1b[3~': 'Delete',
+    b'\x1b[5~': 'PageUp',
+    b'\x1b[6~': 'PageDown',
     # Простые символы
-    '\x1b': 'ESC',
-    '\t': 'TAB',
-    '\x7f': 'BackSpace'
+    b'\x1b': 'ESC',
+    b'\t': 'TAB',
+    b'\x7f': 'BackSpace'
+}
+
+UNIX_SPEC_SYM: dict[str, str] = {
+    #? number line
+    #     EN specific
+    '!': 'shift + 1',
+    '@': 'shift + 2',
+    '#': 'shift + 3',
+    '$': 'shift + 4',
+    '%': 'shift + 5',
+    '^': 'shift + 6',
+    '&': 'shift + 7',
+    '*': 'shift + 8',
+    '(': 'shift + 9',
+    ')': 'shift + 0',
+    #? upper symbols
+    'Q': 'shift + q',
+    'W': 'shift + w',
+    'E': 'shift + e',
+    'R': 'shift + r',
+    'T': 'shift + t',
+    'Y': 'shift + y',
+    'U': 'shift + u',
+    'I': 'shift + i',
+    'O': 'shift + o',
+    'P': 'shift + p',
+    '{': 'shift + [',
+    '}': 'shift + ]',
+    'A': 'shift + a',
+    'S': 'shift + s',
+    'D': 'shift + d',
+    'F': 'shift + f',
+    'G': 'shift + g',
+    'H': 'shift + h',
+    'J': 'shift + j',
+    'K': 'shift + k',
+    'L': 'shift + l',
+    ':': 'shift + ;',
+    '"': 'shift + \'',
+    'Z': 'shift + z',
+    'X': 'shift + x',
+    'C': 'shift + c',
+    'V': 'shift + v',
+    'B': 'shift + b',
+    'N': 'shift + n',
+    'M': 'shift + m',
+    '<': 'shift + ,',
+    '>': 'shift + .',
+    '?': 'shift + /',
+    ' ': 'Space'
 }
 
 class VK_CODES:

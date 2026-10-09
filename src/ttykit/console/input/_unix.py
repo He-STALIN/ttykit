@@ -4,10 +4,9 @@ from typing import Callable
 from time import sleep
 import re
 
-from ttykit.data import KeyEvent, UNIX_EXTENDED_SYM
+from ttykit.data import KeyEvent, UNIX_EXTENDED_SYM, UNIX_SPEC_SYM
 from ttykit.utils import *
 from ._local import KeyEvent_to_str, str_to_KeyEvent
-
 
 
 class UnixKeyboard:
@@ -37,7 +36,7 @@ class UnixKeyboard:
         except Exception as e:
             raise e
 
-    def _stop(self):
+    def stop(self):
         self._running = False
 
         if self._thread is not None:
@@ -51,51 +50,34 @@ class UnixKeyboard:
             try:
                 tty.setcbreak(self.fd)
 
-                if select.select([sys.stdin], [], [], 0.1)[0]:
-                    key = os.read(self.fd, 1).decode() #sys.stdin.read(1)
+                if select.select([sys.stdin], [], [], 0.15)[0]:
+                    key: bytes = os.read(self.fd, 1)
 
-                    if key in [None, ""]:
+                    if key in [None, b""]:
                         continue
 
-
-                    if key == "\x1b":
+                    if key in [b"\x1b", b"27"]:
                         if select.select([sys.stdin], [], [], 0.15)[0]:
-                            key += os.read(self.fd, 1).decode()
+                            key += os.read(self.fd, 1)
 
-                            if select.select([sys.stdin], [], [], 0.1)[0]:
-                                key += os.read(self.fd, 1).decode()
+                            if select.select([sys.stdin], [], [], 0.15)[0]:
+                                key += os.read(self.fd, 1)
 
-                                if select.select([sys.stdin], [], [], 0.1)[0]:
-                                    key += os.read(self.fd, 1).decode()
-                        # seq = b""
-                        # while True:
-                        #     r, _, _ = select.select([self.fd], [], [], 0.1)
-                        #     if not r:
-                        #         break  # таймаут — возвращаем то, что есть
-                        #     byte = os.read(self.fd, 1)
-                        #     seq += byte
-                        #     # Проверяем: это финальный байт?
-                        #     if seq.startswith(b"\x1bO") and len(seq) == 3:
-                        #         break  # SS3: \x1bO + буква
-                        #     if seq.startswith(b"\x1b[") and seq[-1:].isalpha() or seq[-1:] == b"~":
-                        #         break  # CSI: \x1b[ ... финальная буква
-                        #     if seq == b"\x1b":
-                        #         continue  # ждём следующий байт
-
-                        # key = key + seq.decode()
+                                if select.select([sys.stdin], [], [], 0.15)[0]:
+                                    key += os.read(self.fd, 1)
                     
-                    print(repr(key))
+                        key = UNIX_EXTENDED_SYM.get(bytes(key), key)
 
-                    if key == " ":
-                        key = "Space"
+                    if key in UNIX_SPEC_SYM.keys():
+                        self.now_key = str(UNIX_SPEC_SYM.get(key.decode(), key.decode())).lower()
 
-                    self.now_key = UNIX_EXTENDED_SYM.get(key, key)
-
-                    print(f"{list(self.now_key)}")
+                    # print(f"bytes: {bytes(key)}")
+                    # print(f"repr: {repr(key)}")
+                    # print(f"final: {list(self.now_key)}")
 
                     self._run_hotkey()
             except KeyboardInterrupt:
-                self._stop()
+                self.stop()
             except Exception as e:
                 raise e
             finally:
@@ -151,9 +133,20 @@ class UnixKeyboard:
         Returns:
             key_state (KeyEvent)
         """
-        pass
+        splited_key = self.now_key.split(" + ") #? split & clear from plus with spaces
+        key = splited_key.pop()
 
-    def clear_all_hotkey(self) -> None:
+        return KeyEvent(
+            key = key,
+            key_code = ord(key),
+            meta_key = True if "meta" in splited_key else False,
+            alt_key= True if "alt" in splited_key else False,
+            ctrl_key= True if "ctrl" in splited_key else False,
+            shift_key= True if "shift" in splited_key else False,
+            type = "key"
+        )
+
+    def clear_all_hotkeys(self) -> None:
         """Reset all configured hotkeys"""
         self.hotkeys.clear()
         self.hotkeys = {}
@@ -165,40 +158,8 @@ class UnixKeyboard:
         elif type(hotkey) not in [str, KeyEvent]:
             raise TypeError(f"Argument 'hotkey' can be only 'str' or 'KeyEvent'. Not be {type(hotkey)}")
         
-        keys = re.sub(r"\s+", "", hotkey)
+        keys: str = re.sub(r"\s+", "", hotkey)
         keys = keys.split("+")
         hotkey = " + ".join(keys)
         
         self.hotkeys.pop(hotkey)
-
-
-
-
-if __name__ == "__main__":
-    kb = UnixKeyboard()
-    kb.add_hotkey("ctrl + c", lambda: print("Ctrl + C pressed"))
-    kb.add_hotkey("ctrl + d", lambda: print("Ctrl + D pressed"))
-    kb.add_hotkey("ctrl + e", lambda: print("Ctrl + E pressed"))
-    kb.add_hotkey("ctrl + f", lambda: print("Ctrl + F pressed"))
-    kb.add_hotkey("ctrl + g", lambda: print("Ctrl + G pressed"))
-    kb.add_hotkey("ctrl + h", lambda: print("Ctrl + H pressed"))
-    kb.add_hotkey("ctrl + i", lambda: print("Ctrl + I pressed"))
-    kb.add_hotkey("ctrl + j", lambda: print("Ctrl + J pressed"))
-    kb.add_hotkey("ctrl + k", lambda: print("Ctrl + K pressed"))
-    kb.add_hotkey("ctrl + l", lambda: print("Ctrl + L pressed"))
-    kb.add_hotkey("ctrl + m", lambda: print("Ctrl + M pressed"))
-    kb.add_hotkey("ctrl + n", lambda: print("Ctrl + N pressed"))
-    kb.add_hotkey("ctrl + o", lambda: print("Ctrl + O pressed"))
-    kb.add_hotkey("ctrl + p", lambda: print("Ctrl + P pressed"))
-    kb.add_hotkey("ctrl + q", lambda: print("Ctrl + Q pressed"))
-    kb.add_hotkey("ctrl + r", lambda: print("Ctrl + R pressed"))
-    kb.add_hotkey("ctrl + s", lambda: print("Ctrl + S pressed"))
-    kb.add_hotkey("ctrl + t", lambda: print("Ctrl + T pressed"))
-    kb.add_hotkey("ctrl + u", lambda: print("Ctrl + U pressed"))
-    kb.add_hotkey("ctrl + v", lambda: print("Ctrl + V pressed"))
-    kb.add_hotkey("ctrl + w", lambda: print("Ctrl + W pressed"))
-    kb.add_hotkey("ctrl + x", lambda: print("Ctrl + X pressed"))
-    kb.add_hotkey("ctrl + y", lambda: print("Ctrl + Y pressed"))
-
-    while True:
-        pass
