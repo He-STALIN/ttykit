@@ -15,6 +15,11 @@
 
 # Versions
 
+## [0.5.0] - 
+- New `Input` submodule
+- Bug fixes
+- Updated view design for `Status`
+
 ## [0.4.0] - 13 Sep 2026
 - Added ETA in `Progress`
 - Added new class `Tree` - create tree structure in terminal

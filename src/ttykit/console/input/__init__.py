@@ -3,7 +3,7 @@ import platform as _platform
 from warnings import warn
 
 from ._local import str_to_KeyEvent, KeyEvent_to_str
-from ttykit.utils import InputWarning, SupportError
+from ttykit.utils import InputWarning, SupportError, SupportWarning
 from ttykit.data import KeyEvent as _KeyEvent
 
 if _platform.system() == "Windows":
@@ -18,6 +18,12 @@ elif _platform.system() == "Linux":
 # elif _platform.system() == "Darwin":
 else:
     raise SupportError(f"Unsupported operating system: {_platform.system()}")
+
+try:
+    import IPython
+    warn("Submodule Input can don't work on IPython", SupportWarning)
+except ImportError:
+    pass
 
 _kb = None
 

@@ -16,6 +16,8 @@
         > show interface
     - `Tree` [GO](#tree-class)
         > compile structure in tree view
+    - and submodule `Input` [GO](#input-submodule)
+        > provides methods for working with user input
 - Also have utility classes:
     - `TaskState` [GO](#taskstate-class)
     - `Colors` [GO](#colors-class)
@@ -370,6 +372,72 @@ tree = Tree(label="Example of tree")
         ├── main.py
         └── decorators.py
     ```
+
+
+## `Input` Submodule
+> Often the most useful submodule (hereinafter referred to as the "module"), though there are a few points worth noting:
+>
+> 1. **Local Input**: Unlike the `keyboard` package, this module only captures local input—that is, it only registers keystrokes when the terminal is the active window.
+> 2. **Cross-platform Compatibility**: While I have aimed for cross-platform support, the current implementation only covers `Windows` and `Unix`-based systems. On other systems, a `SupportError` will be raised.
+> 3. **Work in Progress**: This module will be updated frequently in future versions; therefore, it is recommended to verify that your code still functions correctly after every update to `ttykit`.
+>
+> **IMPORTANT**: Although the module is cross-platform, the implementation for Unix-like systems has known issues with input reading. Consequently, the likelihood of special keys being registered correctly is only about `15–20%`.
+>
+> This issue is beyond my control!
+>
+> ---
+>
+> To get started, simply use:
+```python
+from ttykit import Input
+```
+> Since this is a submodule, I’ve made things easier for you: you can call its functions directly from the module itself.
+>
+> Now, let’s look at the functions:
+- `add_hotkey(hotkey, callback)`
+    > This method adds a key combination to a list; when that combination is pressed, the specified callback method is triggered. 
+    >
+    > `hotkey`: The key combination to bind. Must be a string or a [`KeyEvent`](#keyevent-dataclass) object. 
+    >
+    > `callback`: The method to be invoked when the key combination is pressed. It must be a callable; otherwise, a `CallableError` will be raised. 
+    >
+    > Example:
+    ```python
+    def example(): # your method to be called
+    ...
+
+                #   hotkey combination
+                #       |         method to be called
+                #       |            | 
+                #       v            v
+    Input.add_hotkey("shift + g", example)
+    ```
+- `send(hotkey)`
+    > This method presses and releases a hotkey combination. 
+    > As with all other methods, `hotkey` must be provided as a string representation or a `KeyEvent` object.
+- `press(hotkey)`
+    > Simulates pressing down a hotkey combination.
+- `release(hotkey)`
+    > Releases a hotkey combination.
+- `clear_all_hotkeys()`
+    > Clears all registered hotkeys. Takes no arguments.
+- `clear_hotkey(hotkey)`
+    > Removes the specified hotkey combination from the list.
+- `get_key()`
+    > Returns the `KeyEvent` for the most recently pressed key.
+> That covers the available functionality. Here is a complete code example:
+```python
+from ttykit import Input
+
+def download():
+... # your code
+
+def set_star():
+... # your code again
+
+Input.add_hotkey("shift + d", download) # add a binding
+Input.add_hotkey("shift+s", set_star) # add a binding
+```
 
 
 ---

@@ -3,3 +3,6 @@ class TTYWarning(UserWarning):
 
 class InputWarning(TTYWarning):
     """Calling when warning related with input system"""
+
+class SupportWarning(TTYWarning):
+    """calling when has problems with support"""

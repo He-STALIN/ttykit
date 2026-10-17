@@ -1,5 +1,5 @@
 from .exceptions import TTYError, CallableError, PagingError, RenderError, SupportError
-from .warnings import TTYWarning, InputWarning
+from .warnings import TTYWarning, InputWarning, SupportWarning
 from .utils import set_custom_hook
 
 
@@ -11,5 +11,6 @@ __all__ = [
     'SupportError',
     'TTYWarning',
     'InputWarning',
-    'set_custom_hook'
+    'set_custom_hook',
+    'SupportWarning'
 ]
