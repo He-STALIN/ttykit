@@ -1,4 +1,5 @@
-import keyboard as kb
+from ttykit import Input as kb
+from warnings import warn
 import os, sys
 
 
@@ -42,7 +43,7 @@ class TUI:
     def __init__(self, title: str):
         super().__init__()
 
-        print("[WARNING] Class 'TUI' not fully completed and may contain errors.")
+        warn("This class is not actually an interface and will be removed when a full-fledged TUI composer is created.", FutureWarning, stacklevel=2)
 
         self.TITLE: str = title if title else "Text UI"
         self.FOOTER: str = "For control use arrows Up/Down and Enter to select"

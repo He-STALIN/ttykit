@@ -71,10 +71,6 @@ class UnixKeyboard:
                     if key in UNIX_SPEC_SYM.keys():
                         self.now_key = str(UNIX_SPEC_SYM.get(key.decode(), key.decode())).lower()
 
-                    # print(f"bytes: {bytes(key)}")
-                    # print(f"repr: {repr(key)}")
-                    # print(f"final: {list(self.now_key)}")
-
                     self._run_hotkey()
             except KeyboardInterrupt:
                 self.stop()

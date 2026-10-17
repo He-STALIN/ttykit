@@ -49,7 +49,7 @@ __all__ = [
 
 __name__ = 'ttykit'
 __author__ = 'He-STALIN'
-__version__ = '0.5.0b'
+__version__ = '0.5.0'
 __license__ = 'MIT'
 
 

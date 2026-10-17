@@ -15,7 +15,7 @@
 
 # Versions
 
-## [0.5.0] - 
+## [0.5.0] - 17 Oct 2026
 - New `Input` submodule
 - Bug fixes
 - Updated view design for `Status`
